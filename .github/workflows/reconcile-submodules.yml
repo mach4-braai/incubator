@@ -1,0 +1,135 @@
+name: Reconcile submodules
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: incubator-reconcile
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    name: Reconcile idea submodules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint incubator bot token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.INCUBATOR_BOT_APP_ID }}
+          private-key: ${{ secrets.INCUBATOR_BOT_PRIVATE_KEY }}
+          owner: mach4-braai
+
+      - name: Check out incubator
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Reconcile submodules
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config --global user.name 'incubator-bot[bot]'
+          git config --global user.email 'incubator-bot[bot]@users.noreply.github.com'
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf 'https://github.com/'
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf 'git@github.com:'
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          start_sha="$(git rev-parse HEAD)"
+          work_root="$(mktemp -d)"
+          trap 'rm -rf "$work_root"' EXIT
+
+          escape_sed_replacement() {
+            printf '%s' "$1" | sed 's/[\\/&]/\\&/g'
+          }
+
+          submodule_exists() {
+            module_path="$1"
+            [ -f .gitmodules ] || return 1
+            git config -f .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null \
+              | awk '{ $1=""; sub(/^ /, ""); print }' \
+              | grep -Fx -- "$module_path" >/dev/null
+          }
+
+          jq -c '.ideas[]' ideas.json | while IFS= read -r idea; do
+            name="$(printf '%s' "$idea" | jq -r '.name')"
+            description="$(printf '%s' "$idea" | jq -r '.description')"
+            created="$(printf '%s' "$idea" | jq -r '.created // empty')"
+            year="${created%%-*}"
+            if [ -z "$year" ] || [ "$year" = "$created" ]; then
+              year="$(date -u +%Y)"
+            fi
+            author='mach4-braai'
+            repo_slug="mach4-braai/${name}"
+
+            if ! gh repo view "$repo_slug" >/dev/null 2>&1; then
+              echo "Skipping ${repo_slug}: repository does not exist."
+              continue
+            fi
+
+            if submodule_exists "$name"; then
+              echo "Skipping ${name}: already listed in .gitmodules."
+              continue
+            fi
+
+            echo "Initializing ${repo_slug} and linking it as a submodule."
+            idea_dir="${work_root}/${name}"
+            git clone "git@github.com:${repo_slug}.git" "$idea_dir"
+
+            (
+              cd "$idea_dir"
+              if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+                rm -rf .git
+                git init -b master
+                git remote add origin "git@github.com:${repo_slug}.git"
+              fi
+
+              cp -R "${GITHUB_WORKSPACE}/template/." .
+
+              name_sed="$(escape_sed_replacement "$name")"
+              description_sed="$(escape_sed_replacement "$description")"
+              year_sed="$(escape_sed_replacement "$year")"
+              author_sed="$(escape_sed_replacement "$author")"
+
+              find . -path './.git' -prune -o -type f -print | while IFS= read -r file; do
+                tmp_file="$(mktemp)"
+                sed \
+                  -e "s/{{name}}/${name_sed}/g" \
+                  -e "s/{{description}}/${description_sed}/g" \
+                  -e "s/{{year}}/${year_sed}/g" \
+                  -e "s/{{author}}/${author_sed}/g" \
+                  "$file" > "$tmp_file"
+                cat "$tmp_file" > "$file"
+                rm -f "$tmp_file"
+              done
+
+              git add -A
+              if git diff --cached --quiet; then
+                echo "No initial content changes to commit for ${repo_slug}."
+              else
+                git commit -m 'Initial commit'
+                git push origin master
+              fi
+            )
+
+            git submodule add "git@github.com:${repo_slug}.git" "$name"
+            git add .gitmodules "$name"
+            git commit -m "chore: link ${name} as submodule"
+          done
+
+          if [ "$(git rev-parse HEAD)" = "$start_sha" ]; then
+            echo 'No incubator submodule changes to push.'
+          else
+            git push origin HEAD:master
+          fi
