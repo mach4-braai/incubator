@@ -1,0 +1,9 @@
+{
+  "ideas": [
+    {
+      "name": "voice-dictation",
+      "description": "Real-time voice dictation: Go server with TEN VAD and swappable STT backends over gRPC",
+      "created": "2026-06-10"
+    }
+  ]
+}
