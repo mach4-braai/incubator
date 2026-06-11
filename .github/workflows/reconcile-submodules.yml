@@ -19,9 +19,9 @@ jobs:
     steps:
       - name: Mint incubator bot token
         id: app-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.INCUBATOR_BOT_APP_ID }}
+          client-id: ${{ secrets.INCUBATOR_BOT_CLIENT_ID }}
           private-key: ${{ secrets.INCUBATOR_BOT_PRIVATE_KEY }}
           owner: mach4-braai
 
