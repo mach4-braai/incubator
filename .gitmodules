@@ -1,0 +1,3 @@
+[submodule "voice-dictation"]
+	path = voice-dictation
+	url = git@github.com:mach4-braai/voice-dictation.git
