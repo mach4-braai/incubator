@@ -4,6 +4,61 @@
       "name": "voice-dictation",
       "description": "Real-time voice dictation: Go server with TEN VAD and swappable STT backends over gRPC",
       "created": "2026-06-10"
+    },
+    {
+      "name": "moxer",
+      "description": "A text-only terminal boxing game that lets the player feel a simplified version of being a boxer without being hit in the face.",
+      "created": "2026-06-10"
+    },
+    {
+      "name": "learning-graph",
+      "description": "Personal knowledge graph agent — builds an Obsidian vault from Claude sessions, grill-me conversations, and articles to map your zone of proximal development.",
+      "created": "2026-05-27"
+    },
+    {
+      "name": "agent-conductor",
+      "description": "Claude Code skill: Opus 4.7 plans, DeepSeek v4 agents implement in Docker containers, merge agent lands work back on main.",
+      "created": "2026-05-14"
+    },
+    {
+      "name": "family-cloud",
+      "description": "Self-hosted Nextcloud on Hetzner for ~10 family users — OpenTofu, Docker Compose, and S3 primary storage.",
+      "created": "2026-04-22"
+    },
+    {
+      "name": "value-lens",
+      "description": "RAG-powered financial analysis tool — SEC filing ingestion, pgvector search, and Claude synthesis for value investing.",
+      "created": "2026-04-07"
+    },
+    {
+      "name": "sky-spotter",
+      "description": "Real-time flight tracking app with compass pointer and incoming flight predictions via ADSB.lol.",
+      "created": "2026-03-06"
+    },
+    {
+      "name": "sumo-analytics",
+      "description": "Sumo wrestling analytics dashboard with wrestler stats, tournament results, and technique analytics.",
+      "created": "2026-02-08"
+    },
+    {
+      "name": "pixel-sling",
+      "description": "Minimalist browser physics game — hold SPACE to swing a shepherd's sling, then release to throw.",
+      "created": "2026-02-03"
+    },
+    {
+      "name": "whatsapp-sidecar",
+      "description": "Local sidecar app that mirrors WhatsApp conversations in a web UI with AI-generated summaries while remaining read-only.",
+      "created": "2026-02-02"
+    },
+    {
+      "name": "github-actions-agent-swarm",
+      "description": "Local agent orchestrator dispatching sub-tasks to GitHub Actions workflows as ephemeral agents.",
+      "created": "2026-01-28"
+    },
+    {
+      "name": "k8s-whisper-homelab",
+      "description": "Multi-node Kubernetes home lab with a Raspberry Pi edge node running Whisper for self-hosted speech-to-text.",
+      "created": "2026-01-28"
     }
   ]
 }
