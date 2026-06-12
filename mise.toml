@@ -1,0 +1,7 @@
+[tasks.init]
+description = "Initialize submodules and check each out onto its tracking branch"
+run = """
+git submodule update --init --recursive
+git submodule foreach 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch 2>/dev/null || echo master)'
+git config submodule.recurse true
+"""

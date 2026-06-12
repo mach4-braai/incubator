@@ -2,6 +2,18 @@
 
 This repository holds a lightweight register of early project ideas before they become standalone repositories or provisioned services.
 
+## Local setup
+
+Each idea is a git submodule pointing at its own repository. Clone with submodules and run the init task so each submodule lands on its tracking branch:
+
+```sh
+git clone --recurse-submodules git@github.com:mach4-braai/incubator.git
+cd incubator
+mise run init
+```
+
+For an existing clone where submodules were never initialized, run `mise run init` from the incubator root.
+
 ## Idea registry
 
 - Browse the current idea log in [ideas.md](ideas.md).

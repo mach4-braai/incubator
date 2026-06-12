@@ -7,7 +7,7 @@ This repository is a lightweight incubator for project ideas. Keep changes small
 - Append a dated entry to `ideas.md` for each new idea.
 - Append a matching object to the `ideas` array in `ideas.json` for each new idea.
 - Do not create directories for ideas or prototypes unless explicitly asked.
-- Do not add git submodules.
+- Submodule lifecycle is managed by `.github/workflows/reconcile-submodules.yml` (links new idea repos) and Dependabot (bumps pinned SHAs). Do not add or bump submodules by hand.
 - Do not touch `template/` unless explicitly asked.
 - Keep `ideas.md` and `ideas.json` synchronized.
 
