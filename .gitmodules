@@ -1,3 +1,47 @@
 [submodule "voice-dictation"]
 	path = voice-dictation
 	url = git@github.com:mach4-braai/voice-dictation.git
+[submodule "moxer"]
+	path = moxer
+	url = git@github.com:mach4-braai/moxer.git
+	branch = master
+[submodule "learning-graph"]
+	path = learning-graph
+	url = git@github.com:mach4-braai/learning-graph.git
+	branch = master
+[submodule "agent-conductor"]
+	path = agent-conductor
+	url = git@github.com:mach4-braai/agent-conductor.git
+	branch = master
+[submodule "family-cloud"]
+	path = family-cloud
+	url = git@github.com:mach4-braai/family-cloud.git
+	branch = master
+[submodule "value-lens"]
+	path = value-lens
+	url = git@github.com:mach4-braai/value-lens.git
+	branch = master
+[submodule "sky-spotter"]
+	path = sky-spotter
+	url = git@github.com:mach4-braai/sky-spotter.git
+	branch = master
+[submodule "sumo-analytics"]
+	path = sumo-analytics
+	url = git@github.com:mach4-braai/sumo-analytics.git
+	branch = master
+[submodule "pixel-sling"]
+	path = pixel-sling
+	url = git@github.com:mach4-braai/pixel-sling.git
+	branch = master
+[submodule "whatsapp-sidecar"]
+	path = whatsapp-sidecar
+	url = git@github.com:mach4-braai/whatsapp-sidecar.git
+	branch = master
+[submodule "github-actions-agent-swarm"]
+	path = github-actions-agent-swarm
+	url = git@github.com:mach4-braai/github-actions-agent-swarm.git
+	branch = master
+[submodule "k8s-whisper-homelab"]
+	path = k8s-whisper-homelab
+	url = git@github.com:mach4-braai/k8s-whisper-homelab.git
+	branch = master
