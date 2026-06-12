@@ -13,9 +13,12 @@ permissions:
   contents: read
 
 jobs:
-  reconcile:
-    name: Reconcile idea submodules
+  discover:
+    name: Discover idea submodules to sync
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+      count: ${{ steps.discover.outputs.count }}
     steps:
       - name: Mint incubation bot token
         id: app-token
@@ -32,10 +35,190 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
 
-      - name: Reconcile submodules
+      - name: Discover missing idea submodules
+        id: discover
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          submodule_exists() {
+            module_path="$1"
+            [ -f .gitmodules ] || return 1
+            git config -f .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null \
+              | awk '{ $1=""; sub(/^ /, ""); print }' \
+              | grep -Fx -- "$module_path" >/dev/null
+          }
+
+          missing_ideas_json="$({
+            jq -c '.ideas[]' ideas.json | while IFS= read -r idea; do
+              name="$(printf '%s' "$idea" | jq -r '.name')"
+              description="$(printf '%s' "$idea" | jq -r '.description')"
+              created="$(printf '%s' "$idea" | jq -r '.created // empty')"
+              year="${created%%-*}"
+              if [ -z "$year" ] || [ "$year" = "$created" ]; then
+                year="$(date -u +%Y)"
+              fi
+              author='mach4-braai'
+              repo_slug="mach4-braai/${name}"
+              submodule_url="git@github.com:${repo_slug}.git"
+
+              if submodule_exists "$name"; then
+                echo "Skipping ${name}: already listed in .gitmodules." >&2
+                continue
+              fi
+
+              if ! gh repo view "$repo_slug" >/dev/null 2>&1; then
+                echo "Skipping ${repo_slug}: repository does not exist." >&2
+                continue
+              fi
+
+              jq -nc \
+                --arg name "$name" \
+                --arg description "$description" \
+                --arg created "$created" \
+                --arg year "$year" \
+                --arg author "$author" \
+                --arg repo_slug "$repo_slug" \
+                --arg submodule_url "$submodule_url" \
+                '{name: $name, description: $description, created: $created, year: $year, author: $author, repo_slug: $repo_slug, submodule_url: $submodule_url}'
+            done
+          } | jq -cs '{include: .}')"
+          count="$(printf '%s' "$missing_ideas_json" | jq '.include | length')"
+
+          echo "Discovered ${count} idea repositories to sync."
+          printf '%s\n' "$missing_ideas_json" | jq .
+
+          {
+            echo 'matrix<<EOF'
+            printf '%s\n' "$missing_ideas_json"
+            echo 'EOF'
+            echo "count=${count}"
+          } >> "$GITHUB_OUTPUT"
+
+  sync-idea-repos:
+    name: Sync idea repo (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    needs: discover
+    if: needs.discover.outputs.count != '0'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+    steps:
+      - name: Mint incubation bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.INCUBATOR_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.INCUBATOR_BOT_PRIVATE_KEY }}
+          owner: mach4-braai
+
+      - name: Check out incubator
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: master
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Initialize idea repository
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          IDEA_NAME: ${{ matrix.name }}
+          IDEA_DESCRIPTION: ${{ matrix.description }}
+          IDEA_YEAR: ${{ matrix.year }}
+          IDEA_AUTHOR: ${{ matrix.author }}
+          REPO_SLUG: ${{ matrix.repo_slug }}
+          SUBMODULE_URL: ${{ matrix.submodule_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config --global user.name 'incubation-bot[bot]'
+          git config --global user.email 'incubation-bot[bot]@users.noreply.github.com'
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf 'https://github.com/'
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf 'git@github.com:'
+
+          work_root="$(mktemp -d)"
+          trap 'rm -rf "$work_root"' EXIT
+
+          escape_sed_replacement() {
+            printf '%s' "$1" | sed 's/[\\/&]/\\&/g'
+          }
+
+          idea_dir="${work_root}/${IDEA_NAME}"
+          git clone "$SUBMODULE_URL" "$idea_dir"
+
+          (
+            cd "$idea_dir"
+            if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+              rm -rf .git
+              git init -b master
+              git remote add origin "$SUBMODULE_URL"
+            elif git show-ref --verify --quiet refs/remotes/origin/master; then
+              git checkout -B master origin/master
+            elif [ "$(git branch --show-current)" != 'master' ]; then
+              git checkout -B master
+            fi
+
+            cp -R "${GITHUB_WORKSPACE}/template/." .
+
+            name_sed="$(escape_sed_replacement "$IDEA_NAME")"
+            description_sed="$(escape_sed_replacement "$IDEA_DESCRIPTION")"
+            year_sed="$(escape_sed_replacement "$IDEA_YEAR")"
+            author_sed="$(escape_sed_replacement "$IDEA_AUTHOR")"
+
+            find . -path './.git' -prune -o -type f -print | while IFS= read -r file; do
+              tmp_file="$(mktemp)"
+              sed \
+                -e "s/{{name}}/${name_sed}/g" \
+                -e "s/{{description}}/${description_sed}/g" \
+                -e "s/{{year}}/${year_sed}/g" \
+                -e "s/{{author}}/${author_sed}/g" \
+                "$file" > "$tmp_file"
+              cat "$tmp_file" > "$file"
+              rm -f "$tmp_file"
+            done
+
+            git add -A
+            if git diff --cached --quiet; then
+              echo "No initial content changes to commit for ${REPO_SLUG}."
+            else
+              git commit -m 'Initial commit'
+              git push origin master
+            fi
+          )
+
+          gh repo edit "$REPO_SLUG" --default-branch master || true
+
+  link-submodules:
+    name: Link idea submodules
+    runs-on: ubuntu-latest
+    needs: [discover, sync-idea-repos]
+    if: needs.discover.outputs.count != '0'
+    steps:
+      - name: Mint incubation bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.INCUBATOR_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.INCUBATOR_BOT_PRIVATE_KEY }}
+          owner: mach4-braai
+
+      - name: Check out incubator
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: master
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Link missing submodules
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          MATRIX: ${{ needs.discover.outputs.matrix }}
         shell: bash
         run: |
           set -euo pipefail
@@ -46,14 +229,6 @@ jobs:
           git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf 'git@github.com:'
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          start_sha="$(git rev-parse HEAD)"
-          work_root="$(mktemp -d)"
-          trap 'rm -rf "$work_root"' EXIT
-
-          escape_sed_replacement() {
-            printf '%s' "$1" | sed 's/[\\/&]/\\&/g'
-          }
-
           submodule_exists() {
             module_path="$1"
             [ -f .gitmodules ] || return 1
@@ -62,74 +237,24 @@ jobs:
               | grep -Fx -- "$module_path" >/dev/null
           }
 
-          jq -c '.ideas[]' ideas.json | while IFS= read -r idea; do
+          printf '%s' "$MATRIX" | jq -c '.include[]' | while IFS= read -r idea; do
             name="$(printf '%s' "$idea" | jq -r '.name')"
-            description="$(printf '%s' "$idea" | jq -r '.description')"
-            created="$(printf '%s' "$idea" | jq -r '.created // empty')"
-            year="${created%%-*}"
-            if [ -z "$year" ] || [ "$year" = "$created" ]; then
-              year="$(date -u +%Y)"
-            fi
-            author='mach4-braai'
-            repo_slug="mach4-braai/${name}"
-
-            if ! gh repo view "$repo_slug" >/dev/null 2>&1; then
-              echo "Skipping ${repo_slug}: repository does not exist."
-              continue
-            fi
+            repo_slug="$(printf '%s' "$idea" | jq -r '.repo_slug')"
+            submodule_url="$(printf '%s' "$idea" | jq -r '.submodule_url')"
 
             if submodule_exists "$name"; then
               echo "Skipping ${name}: already listed in .gitmodules."
               continue
             fi
 
-            echo "Initializing ${repo_slug} and linking it as a submodule."
-            idea_dir="${work_root}/${name}"
-            git clone "git@github.com:${repo_slug}.git" "$idea_dir"
-
-            (
-              cd "$idea_dir"
-              if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
-                rm -rf .git
-                git init -b master
-                git remote add origin "git@github.com:${repo_slug}.git"
-              fi
-
-              cp -R "${GITHUB_WORKSPACE}/template/." .
-
-              name_sed="$(escape_sed_replacement "$name")"
-              description_sed="$(escape_sed_replacement "$description")"
-              year_sed="$(escape_sed_replacement "$year")"
-              author_sed="$(escape_sed_replacement "$author")"
-
-              find . -path './.git' -prune -o -type f -print | while IFS= read -r file; do
-                tmp_file="$(mktemp)"
-                sed \
-                  -e "s/{{name}}/${name_sed}/g" \
-                  -e "s/{{description}}/${description_sed}/g" \
-                  -e "s/{{year}}/${year_sed}/g" \
-                  -e "s/{{author}}/${author_sed}/g" \
-                  "$file" > "$tmp_file"
-                cat "$tmp_file" > "$file"
-                rm -f "$tmp_file"
-              done
-
-              git add -A
-              if git diff --cached --quiet; then
-                echo "No initial content changes to commit for ${repo_slug}."
-              else
-                git commit -m 'Initial commit'
-                git push origin master
-              fi
-            )
-
-            git submodule add "git@github.com:${repo_slug}.git" "$name"
+            echo "Linking ${repo_slug} as ${name}."
+            git submodule add -b master "$submodule_url" "$name"
             git add .gitmodules "$name"
-            git commit -m "chore: link ${name} as submodule"
           done
 
-          if [ "$(git rev-parse HEAD)" = "$start_sha" ]; then
+          if git diff --cached --quiet; then
             echo 'No incubator submodule changes to push.'
           else
+            git commit -m 'chore: link idea submodules'
             git push origin HEAD:master
           fi
