@@ -18,3 +18,17 @@ This repository is a lightweight incubator for project ideas. Keep changes small
 - `name`: machine-friendly project name, usually kebab-case.
 - `description`: one-sentence project summary.
 - `created`: creation date in `YYYY-MM-DD` format.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub at `mach4-braai/incubator`, accessed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical five-role vocabulary, using the default label names. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
