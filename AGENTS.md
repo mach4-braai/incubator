@@ -4,12 +4,10 @@ This repository is a lightweight incubator for project ideas. Keep changes small
 
 ## Required workflow
 
-- Append a dated entry to `ideas.md` for each new idea.
-- Append a matching object to the `ideas` array in `ideas.json` for each new idea.
+- Register each new idea by appending a matching object to the `ideas` array in `ideas.json`. This file is the single source of truth for the idea registry.
 - Do not create directories for ideas or prototypes unless explicitly asked.
-- Submodule lifecycle is managed by `.github/workflows/reconcile-submodules.yml` (links new idea repos) and Dependabot (bumps pinned SHAs). Do not add or bump submodules by hand.
+- Submodule lifecycle is managed by `.github/workflows/reconcile-submodules.yml` (links idea repos that already exist on GitHub) and Dependabot (bumps pinned SHAs). Do not add or bump submodules by hand.
 - Do not touch `template/` unless explicitly asked.
-- Keep `ideas.md` and `ideas.json` synchronized.
 
 ## Idea schema
 
