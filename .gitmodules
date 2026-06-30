@@ -45,3 +45,7 @@
 	path = k8s-whisper-homelab
 	url = git@github.com:mach4-braai/k8s-whisper-homelab.git
 	branch = master
+[submodule "anki-card-linter"]
+	path = anki-card-linter
+	url = git@github.com:mach4-braai/anki-card-linter.git
+	branch = master
