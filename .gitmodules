@@ -49,3 +49,7 @@
 	path = anki-card-linter
 	url = git@github.com:mach4-braai/anki-card-linter.git
 	branch = master
+[submodule "idv-knowledge-roadmap"]
+	path = idv-knowledge-roadmap
+	url = git@github.com:mach4-braai/idv-knowledge-roadmap.git
+	branch = master
