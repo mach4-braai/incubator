@@ -1,6 +1,11 @@
 {
   "ideas": [
     {
+      "name": "idv-knowledge-roadmap",
+      "description": "Interactive, roadmap.sh-style knowledge roadmap that takes a developer from zero to semi-expert in identity verification and digital trust — click-through nodes spanning foundations (identity, cryptography, IAM/Web2), decentralized identity (W3C DIDs/VCs, the ToIP stack, Hyperledger Aries/Indy, OID4VC, ISO mDL), and the South African applied layer (FICA/POPIA/RICA compliance and the DIDx suite).",
+      "created": "2026-07-07"
+    },
+    {
       "name": "anki-card-linter",
       "description": "Critique-only Anki add-on: a bring-your-own-key LLM lints hand-written cards against the Minimum Information Principle and Matuschak's prompt properties, flagging violations without ever authoring the card.",
       "created": "2026-06-30"
