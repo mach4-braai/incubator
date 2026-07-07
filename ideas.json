@@ -2,7 +2,7 @@
   "ideas": [
     {
       "name": "idv-knowledge-roadmap",
-      "description": "Interactive, roadmap.sh-style knowledge roadmap that takes a developer from zero to semi-expert in identity verification and digital trust — click-through nodes spanning foundations (identity, cryptography, IAM/Web2), decentralized identity (W3C DIDs/VCs, the ToIP stack, Hyperledger Aries/Indy, OID4VC, ISO mDL), and the South African applied layer (FICA/POPIA/RICA compliance and the DIDx suite).",
+      "description": "Interactive, roadmap.sh-style knowledge roadmap taking a developer from zero to semi-expert in identity verification and digital trust: foundations (identity, crypto, IAM), decentralized identity (W3C DIDs/VCs, ToIP, Aries/Indy, OID4VC, mDL), and the South African applied layer (FICA/POPIA/RICA and the DIDx suite).",
       "created": "2026-07-07"
     },
     {
