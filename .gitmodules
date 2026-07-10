@@ -53,3 +53,7 @@
 	path = idv-knowledge-roadmap
 	url = git@github.com:mach4-braai/idv-knowledge-roadmap.git
 	branch = master
+[submodule "ai-subscription-wallet"]
+	path = ai-subscription-wallet
+	url = git@github.com:mach4-braai/ai-subscription-wallet.git
+	branch = master
