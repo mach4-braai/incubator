@@ -1,6 +1,11 @@
 {
   "ideas": [
     {
+      "name": "ai-subscription-wallet",
+      "description": "Financial and identity layer for AI subscriptions: companies deposit a monthly AI budget, admins allocate per-employee budgets, developers self-serve an approved catalog of AI tools (ChatGPT, Claude, Cursor, Gemini), and finance receives a single invoice instead of vendor lock-in.",
+      "created": "2026-07-10"
+    },
+    {
       "name": "idv-knowledge-roadmap",
       "description": "Interactive, roadmap.sh-style knowledge roadmap taking a developer from zero to semi-expert in identity verification and digital trust: foundations (identity, crypto, IAM), decentralized identity (W3C DIDs/VCs, ToIP, Aries/Indy, OID4VC, mDL), and the South African applied layer (FICA/POPIA/RICA and the DIDx suite).",
       "created": "2026-07-07"
