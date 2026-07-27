@@ -57,3 +57,7 @@
 	path = ai-subscription-wallet
 	url = git@github.com:mach4-braai/ai-subscription-wallet.git
 	branch = master
+[submodule "hum"]
+	path = hum
+	url = git@github.com:mach4-braai/hum.git
+	branch = master
