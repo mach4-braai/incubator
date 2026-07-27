@@ -17,6 +17,10 @@ This repository is a lightweight incubator for project ideas. Keep changes small
 - `description`: one-sentence project summary.
 - `created`: creation date in `YYYY-MM-DD` format.
 
+## Implementation language
+
+Go is the preferred implementation language for incubator projects.
+
 ## Agent skills
 
 ### Issue tracker
