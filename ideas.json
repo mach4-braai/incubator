@@ -1,11 +1,6 @@
 {
   "ideas": [
     {
-      "name": "hum",
-      "description": "Local-first daemon and CLI that renders work-session lifecycle events as an ambient musical soundscape: one work session maps to one sustained drone in a chosen key and scale, with completion and failure phrases, driven by a provider-agnostic event protocol over a Unix socket.",
-      "created": "2026-07-27"
-    },
-    {
       "name": "ai-subscription-wallet",
       "description": "Financial and identity layer for AI subscriptions: companies deposit a monthly AI budget, admins allocate per-employee budgets, developers self-serve an approved catalog of AI tools (ChatGPT, Claude, Cursor, Gemini), and finance receives a single invoice instead of vendor lock-in.",
       "created": "2026-07-10"
@@ -79,6 +74,11 @@
       "name": "k8s-whisper-homelab",
       "description": "Multi-node Kubernetes home lab with a Raspberry Pi edge node running Whisper for self-hosted speech-to-text.",
       "created": "2026-01-28"
+    },
+    {
+      "name": "hum",
+      "description": "Local-first daemon and CLI that renders work-session lifecycle events as an ambient musical soundscape: one work session maps to one sustained drone in a chosen key and scale, with completion and failure phrases, driven by a provider-agnostic event protocol over a Unix socket.",
+      "created": "2026-07-27"
     }
   ]
 }
