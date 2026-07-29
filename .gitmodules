@@ -61,7 +61,3 @@
 	path = hum
 	url = git@github.com:mach4-braai/hum.git
 	branch = master
-[submodule "homebrew-tap"]
-	path = homebrew-tap
-	url = git@github.com:mach4-braai/homebrew-tap.git
-	branch = master
