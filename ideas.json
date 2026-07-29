@@ -79,6 +79,11 @@
       "name": "hum",
       "description": "Local-first daemon and CLI that renders work-session lifecycle events as an ambient musical soundscape: one work session maps to one sustained drone in a chosen key and scale, with completion and failure phrases, driven by a provider-agnostic event protocol over a Unix socket.",
       "created": "2026-07-27"
+    },
+    {
+      "name": "homebrew-tap",
+      "description": "Shared Homebrew tap hosting the formulae for incubator projects that ship as CLIs: named homebrew-tap so that `brew tap mach4-braai/tap` resolves, Homebrew requiring only the `homebrew-` prefix and leaving the suffix free. Each formula builds from source rather than pouring a bottle, and version and SHA bumps are pushed automatically by each project's release workflow.",
+      "created": "2026-07-29"
     }
   ]
 }
