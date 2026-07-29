@@ -82,7 +82,7 @@
     },
     {
       "name": "homebrew-tap",
-      "description": "Shared Homebrew tap hosting the formulae for incubator projects that ship as CLIs: named homebrew-tap so that `brew tap mach4-braai/tap` resolves, Homebrew requiring only the `homebrew-` prefix and leaving the suffix free. Each formula builds from source rather than pouring a bottle, and version and SHA bumps are pushed automatically by each project's release workflow.",
+      "description": "Shared Homebrew tap hosting source-built formulae for the incubator projects that ship as CLIs, resolved by `brew tap mach4-braai/tap`, with version and SHA bumps pushed automatically by each project's release workflow.",
       "created": "2026-07-29"
     }
   ]
