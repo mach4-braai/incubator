@@ -84,6 +84,11 @@
       "name": "homebrew-tap",
       "description": "Shared Homebrew tap hosting source-built formulae for the incubator projects that ship as CLIs, resolved by `brew tap mach4-braai/tap`, with version and SHA bumps pushed automatically by each project's release workflow.",
       "created": "2026-07-29"
+    },
+    {
+      "name": "attentiond",
+      "description": "Local daemon holding one normalized view of what currently needs attention: it takes semantic lifecycle events from tools such as Herdr, command wrappers and GitHub, maps them onto the states working, waiting, needs_attention, done and failed, and serves them over localhost HTTP/JSON for UIs such as Glance.",
+      "created": "2026-09-12"
     }
   ]
 }
