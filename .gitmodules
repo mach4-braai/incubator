@@ -65,3 +65,7 @@
 	path = homebrew-tap
 	url = git@github.com:mach4-braai/homebrew-tap.git
 	branch = master
+[submodule "attentiond"]
+	path = attentiond
+	url = git@github.com:mach4-braai/attentiond.git
+	branch = master
