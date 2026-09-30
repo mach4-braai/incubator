@@ -89,6 +89,16 @@
       "name": "attentiond",
       "description": "Local daemon holding one normalized view of what currently needs attention: it takes semantic lifecycle events from tools such as Herdr, command wrappers and GitHub, maps them onto the states working, waiting, needs_attention, done and failed, and serves them over localhost HTTP/JSON for UIs such as Glance.",
       "created": "2026-09-12"
+    },
+    {
+      "name": "gauger",
+      "description": "GitHub Action that samples runner CPU and memory per step and streams it over Tailscale to gauger-server.",
+      "created": "2026-09-30"
+    },
+    {
+      "name": "gauger-server",
+      "description": "Self-hosted server and web UI that joins GitHub Actions webhook timings with gauger runner metrics in Postgres.",
+      "created": "2026-09-30"
     }
   ]
 }
