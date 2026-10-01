@@ -158,7 +158,8 @@ jobs:
               git init -b master
               git remote add origin "$SUBMODULE_URL"
             elif git show-ref --verify --quiet refs/remotes/origin/master; then
-              git checkout -B master origin/master
+              echo "Skipping template for ${REPO_SLUG}: master already has commits."
+              exit 0
             elif [ "$(git branch --show-current)" != 'master' ]; then
               git checkout -B master
             fi
